@@ -1,0 +1,9 @@
+# Never commit raw or derived data
+data/
+*.zip
+
+# Virtual env
+.venv/
+
+# loan sample data
+sample_data/
