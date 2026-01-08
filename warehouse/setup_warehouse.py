@@ -37,8 +37,9 @@ try:
 except Exception as e:
     print("Acquisition table does not exist yet.")
 
+#Creates curated views
 con.execute(f""" CREATE OR REPLACE VIEW curated.fact_loan_performannce AS
             SELECT * FROM raw.performance_all""")
 
-print(f"DuckDB warehouse setup complete. DB path: {DB_PATH}")
+print(f"DuckDB setup complete. DB path: {DB_PATH}")
 con.close()
