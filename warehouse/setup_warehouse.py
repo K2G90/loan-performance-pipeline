@@ -14,8 +14,8 @@ con.execute("CREATE SCHEMA IF NOT EXISTS curated;")
 # Register all parquet files in staging as external tables (read-only views)
 # Start with performance_* & acquisition_* if they exist.
 
-perf_glob= (STAGING_DIR / "performance_*.parquet").as_posix()
-acq_glob = (STAGING_DIR / "acquisition_*.parquet").as_posix()
+perf_glob= (STAGING_DIR / "performance_*_named.parquet").as_posix()
+acq_glob = (STAGING_DIR / "acquisition_*_named.parquet").as_posix()
 
 #Create or replace raw tables from parquet (external scans).
 con.execute(f""" CREATE OR REPLACE VIEW raw.performance_all AS 
@@ -38,8 +38,8 @@ except Exception as e:
     print("Acquisition table does not exist yet.")
 
 #Creates curated views
-con.execute(f""" CREATE OR REPLACE VIEW curated.fact_loan_performannce AS
-            SELECT * FROM raw.performance_all""")
+con.execute(f"""CREATE OR REPLACE VIEW curated.fact_loan_performance AS
+SELECT * FROM raw.performance_all;""")
 
 print(f"DuckDB setup complete. DB path: {DB_PATH}")
 con.close()
