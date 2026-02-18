@@ -83,16 +83,26 @@ The pipeline architecture diagram will be added under:
 
 ---
 
-## 🚀 Security & Data Handling
+🔐 Security & Data Handling
 
-- Convert Python scheduler to Airflow DAGs
-- Add dbt-style transformations
-- Add Great Expectations–style validation framework
-- Add API or dashboard layer on top of the analytics views
+This project uses publicly available Fannie Mae Single-Family Loan Performance data.
+
+Even though the dataset is public, all data artifacts are treated as sensitive by default:
+
+- Raw, staged, and curated data are excluded from version control via .gitignore
+- Parquet files and DuckDB warehouse files are never committed
+- Environment files (.env) are ignored
+- The pipeline is designed to be fully rebuildable from source data
+
+In a cloud deployment scenario, this pipeline would be configured with:
+
+  - Encrypted storage (S3 with SSE)
+  - Least-privilege IAM roles
+  - Environment-specific separation (dev / prod)
 
 ---
 
 ## 👤 Author
 
-**Cedric Williams**  
+**Cedric Williams**
 Aspiring Data Engineer | Backend x Big Data | Pipeline Optimization

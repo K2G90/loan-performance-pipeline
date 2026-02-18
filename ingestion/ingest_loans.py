@@ -39,10 +39,10 @@ def ingest_file(path: Path, kind: str) -> int:
 
     # You can tweak read_csv options later (chunksize, dtypes, etc.)
     df = pd.read_csv(path, sep="|", header=None, engine="python")
-    
+
     # # Normalize column names: strip spaces, lower-case
     # df.columns = [c.strip().lower() for c in df.columns]
-    
+
      # Assign clean generic column names: col_0, col_1, col_2, ...
     df.columns = [f"col_{i}" for i in range(len(df.columns))]
 

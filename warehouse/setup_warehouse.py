@@ -18,11 +18,11 @@ perf_glob= (STAGING_DIR / "performance_*_named.parquet").as_posix()
 acq_glob = (STAGING_DIR / "acquisition_*_named.parquet").as_posix()
 
 #Create or replace raw tables from parquet (external scans).
-con.execute(f""" CREATE OR REPLACE VIEW raw.performance_all AS 
+con.execute(f""" CREATE OR REPLACE VIEW raw.performance_all AS
             SELECT * FROM read_parquet('{perf_glob}', filename=True);
             """)
 
-con.execute(f""" CREATE OR REPLACE VIEW raw.acquisition_all AS 
+con.execute(f""" CREATE OR REPLACE VIEW raw.acquisition_all AS
             SELECT * FROM read_parquet('{acq_glob}', filename=True);
             """)
 

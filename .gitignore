@@ -1,21 +1,25 @@
-# Never commit raw or derived data
+# Data (never commit data files)
 data/**
-*.zip
 !data/.gitkeep
 
-# Virtual env
-.venv/
+*.parquet
+*.csv
+*.zip
 
 # loan sample data
 sample_data/
 
-# Warehouse dependencies
+# Warehouse artifacts
 warehouse/*.duckdb
 
-*.parquet
-*.csv
 
+
+# Local Environments
+.venv/
 .env
 .env.*
 
+# OS / Misc
 .DS_Store
+# loan sample data
+sample_data/

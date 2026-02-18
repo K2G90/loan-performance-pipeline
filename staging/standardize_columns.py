@@ -26,14 +26,14 @@ def infer_kind(filename: str) -> str:
     if name.startswith("acquisition_"):
         return "acquisition"
     return "unknown"
-        
+
 
 def standardize_one(path: Path) -> Path:
     kind = infer_kind(path.name)
     if kind == "unknown":
         logging.info(f"Skipping unknown file type: {path.name}")
         return path
-    
+
 
     df = pd.read_parquet(path)
     mapping = load_column_map(kind)
