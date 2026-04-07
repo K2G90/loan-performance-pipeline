@@ -1,8 +1,17 @@
-/.vscode
+# macOS
+.DS_Store
 
-# Data (never commit data files)
+# VS Code
+.vscode/
+
+# Data Artifacts
 data/**
 !data/.gitkeep
+ata/raw/
+data/staging/
+data/curated/
+*.parquet
+*.duckdb
 
 *.parquet
 *.csv
@@ -15,14 +24,16 @@ sample_data/
 warehouse/*.duckdb
 
 
+#Python
+__pycache__/
+*.pyc
 
 # Local Environments
 .venv/
 .env
 .env.*
 
-# OS / Misc
-.DS_Store
+
 # loan sample data
 sample_data/
 /analytics_reports
