@@ -1,3 +1,5 @@
+/.vscode
+
 # Data (never commit data files)
 data/**
 !data/.gitkeep
