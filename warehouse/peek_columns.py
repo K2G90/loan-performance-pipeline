@@ -17,8 +17,6 @@ import duckdb
 
 # con.close()
 
-from pathlib import Path
-import duckdb
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_ROOT / "warehouse" / "loans_dw.duckdb"
