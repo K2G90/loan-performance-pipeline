@@ -102,5 +102,4 @@ In a cloud deployment scenario, this pipeline would be configured with:
 
 ## 👤 Author
 
-**Cedric Williams**
-Aspiring Data Engineer | Backend x Big Data | Pipeline Optimization
+Cedric Williams | Data Engineer | Python, SQL, AWS | ETL Pipelines | Backend Systems
