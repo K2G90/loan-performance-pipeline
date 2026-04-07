@@ -66,9 +66,7 @@ SQL views and queries for:
 
 ## 📈 Architecture Diagram
 
-The pipeline architecture diagram will be added under:
-
-`architecture/architecture.png`
+See the architecture folder for pipeline structure and design artifacts.
 
 ---
 
