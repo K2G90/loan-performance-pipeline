@@ -16,8 +16,8 @@ MAX_NULL_PCT_RPT_PD = 0.0       # fail if any null monthly reporting period
 def _pct(n: int, d: int) -> float:
     return 0.0 if d == 0 else (100.0 * n / d)
 
-def validate_parquet_schema(path: Path) -> bool:
-    logging.info(f"Validating schema for: {path.name}")
+def validate_parquet_schema(pat: Path) -> bool:
+    logging.info(f"Validating schema for: {pat.name}")
 
     try:
         df = pd.read_parquet(path)
