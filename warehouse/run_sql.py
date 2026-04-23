@@ -26,10 +26,9 @@ def main() -> None:
         raise FileNotFoundError(f"SQL file not found: {sql_file}")
 
     con = duckdb.connect(DB_PATH.as_posix())
-
     sql = sql_file.read_text()
 
-    # Split on semicolons. This is fine for your current SQL style.
+    # Split on semicolons.
     statements = [s.strip() for s in sql.split(";") if s.strip()]
 
     for stmt in statements:
