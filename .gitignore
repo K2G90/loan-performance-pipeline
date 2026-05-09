@@ -37,3 +37,4 @@ __pycache__/
 # loan sample data
 sample_data/
 /analytics_reports
+.github/
