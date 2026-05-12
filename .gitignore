@@ -38,3 +38,5 @@ __pycache__/
 sample_data/
 /analytics_reports
 .github/
+
+/FNMA_DATA
