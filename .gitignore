@@ -7,7 +7,7 @@
 # Data Artifacts
 data/**
 !data/.gitkeep
-ata/raw/
+data/raw/
 data/staging/
 data/curated/
 *.parquet
