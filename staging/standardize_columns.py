@@ -12,10 +12,28 @@ CONFIG_DIR = PROJECT_ROOT / "config"
 
 def load_column_map(kind: str) -> list[str]:
     path = CONFIG_DIR / f"columns_{kind}.csv"
+
     if not path.exists():
         raise FileNotFoundError(f"Column map file not found: {path}")
-    cols = [line.strip() for line in path.read_text().splitlines() if line.strip()]
-    # print(cols)
+
+    config = pd.read_csv(path)
+
+    required_columns = {
+        "logical_name",
+        "column_index",
+    }
+
+    missing = required_columns - set(config.columns)
+
+    if missing:
+        raise ValueError(
+            f"{path.name} missing required columns: {missing}"
+        )
+
+    config = config.sort_values("column_index")
+
+    cols = config["logical_name"].astype(str).tolist()
+
     return cols
 
 
