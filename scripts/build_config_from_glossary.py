@@ -41,6 +41,21 @@ LOGICAL_NAME_OVERRIDES: dict[str, str] = {
     "monthly_reporting_period": "monthly_reporting_period",
 }
 
+SCHEMA_VARIANT_EXCLUSIONS: dict[int, set[str]] = {
+    # Sample layout has 108 physical columns.
+    # These fields exist in the full glossary layout but are not present in the sample file.
+    108: {
+        "reference_pool_id",
+        "master_servicer",
+        "upb_at_issuance",
+        "loan_age",
+        "remaining_months_to_maturity",
+    },
+
+    # Full layout keeps all glossary fields.
+    113: set(),
+}
+
 
 REQUIRED_GLOSSARY_COLUMNS = [
     "Field Position",
@@ -116,11 +131,17 @@ def build_config(glossary: pd.DataFrame, detected_column_count: int | None = Non
     """Build pipeline config from glossary rows."""
     if detected_column_count is not None:
         max_position = int(glossary["Field Position"].max())
-        if detected_column_count > max_position:
-            raise ValueError(
-                f"Data file has {detected_column_count} columns, but glossary only has "
-                f"{max_position} field positions. Get a newer glossary."
-            )
+
+    if detected_column_count > max_position:
+        raise ValueError(
+            f"Data file has {detected_column_count} columns, but glossary only has "
+            f"{max_position} field positions. Get a newer glossary."
+        )
+
+    # If this detected width has an explicit schema variant rule,
+    # do not truncate by field position here. We will remove known
+    # omitted fields later after logical names are built.
+    if detected_column_count not in SCHEMA_VARIANT_EXCLUSIONS:
         glossary = glossary[glossary["Field Position"] <= detected_column_count].copy()
 
     config = pd.DataFrame()
@@ -140,6 +161,23 @@ def build_config(glossary: pd.DataFrame, detected_column_count: int | None = Non
     config["logical_name"] = config["physical_name"].apply(
         lambda name: LOGICAL_NAME_OVERRIDES.get(name, name)
     )
+
+    exclusions = SCHEMA_VARIANT_EXCLUSIONS.get(detected_column_count, set())
+
+    if exclusions:
+        config = config[~config["logical_name"].isin(exclusions)].copy()
+
+    config = config.reset_index(drop=True)
+
+    # Rebuild positions after exclusions so they match the physical file layout.
+    config["field_position"] = range(1, len(config) + 1)
+    config["column_index"] = config["field_position"] - 1
+
+    if detected_column_count is not None and len(config) != detected_column_count:
+        raise ValueError(
+            f"Config row count ({len(config)}) does not match detected column count "
+            f"({detected_column_count}). Check schema variant exclusions."
+        )
 
     config["source_data_type"] = glossary["Type"].astype(str).str.strip()
     config["source_max_length"] = glossary["Max Length"].astype(str).str.strip()
