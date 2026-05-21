@@ -42,8 +42,7 @@ LOGICAL_NAME_OVERRIDES: dict[str, str] = {
 }
 
 SCHEMA_VARIANT_EXCLUSIONS: dict[int, set[str]] = {
-    # Sample layout has 108 physical columns.
-    # These fields exist in the full glossary layout but are not present in the sample file.
+    # 108-column sample layout excludes fields that exist in the full 113-column glossary.
     108: {
         "reference_pool_id",
         "master_servicer",
@@ -52,7 +51,7 @@ SCHEMA_VARIANT_EXCLUSIONS: dict[int, set[str]] = {
         "remaining_months_to_maturity",
     },
 
-    # Full layout keeps all glossary fields.
+    # Full 113-column layout keeps all glossary fields.
     113: set(),
 }
 
@@ -129,62 +128,66 @@ def load_glossary(glossary_path: Path, sheet_name: str) -> pd.DataFrame:
 
 def build_config(glossary: pd.DataFrame, detected_column_count: int | None = None) -> pd.DataFrame:
     """Build pipeline config from glossary rows."""
+    glossary = glossary.copy()
+
     if detected_column_count is not None:
         max_position = int(glossary["Field Position"].max())
 
-    if detected_column_count > max_position:
-        raise ValueError(
-            f"Data file has {detected_column_count} columns, but glossary only has "
-            f"{max_position} field positions. Get a newer glossary."
-        )
+        if detected_column_count > max_position:
+            raise ValueError(
+                f"Data file has {detected_column_count} columns, but glossary only has "
+                f"{max_position} field positions. Get a newer glossary."
+            )
 
-    # If this detected width has an explicit schema variant rule,
-    # do not truncate by field position here. We will remove known
-    # omitted fields later after logical names are built.
-    if detected_column_count not in SCHEMA_VARIANT_EXCLUSIONS:
-        glossary = glossary[glossary["Field Position"] <= detected_column_count].copy()
+        # If this detected width has an explicit schema variant rule,
+        # do not truncate by field position here. We will remove known
+        # omitted fields after normalized names are built.
+        if detected_column_count not in SCHEMA_VARIANT_EXCLUSIONS:
+            glossary = glossary[glossary["Field Position"] <= detected_column_count].copy()
 
-    config = pd.DataFrame()
-    config["field_position"] = glossary["Field Position"].astype(int)
-
-    # Zero-based index used by pandas after reading headerless files.
-    config["column_index"] = config["field_position"] - 1
-
-    # Official Fannie Mae label as published in the glossary.
-    config["source_field_name"] = glossary["Field Name"].astype(str).str.strip()
-
-    # Physical name = normalized source/vendor field name.
-    # This represents the external contract in machine-friendly form.
-    config["physical_name"] = config["source_field_name"].apply(snake_case)
-
-    # Logical name = internal canonical project name.
-    config["logical_name"] = config["physical_name"].apply(
+    # Build normalized names on the glossary first so metadata stays attached
+    # to the correct original glossary row.
+    glossary["source_field_name"] = glossary["Field Name"].astype(str).str.strip()
+    glossary["physical_name"] = glossary["source_field_name"].apply(snake_case)
+    glossary["logical_name"] = glossary["physical_name"].apply(
         lambda name: LOGICAL_NAME_OVERRIDES.get(name, name)
     )
 
     exclusions = SCHEMA_VARIANT_EXCLUSIONS.get(detected_column_count, set())
 
     if exclusions:
-        config = config[~config["logical_name"].isin(exclusions)].copy()
+        glossary = glossary[~glossary["logical_name"].isin(exclusions)].copy()
 
-    config = config.reset_index(drop=True)
+    glossary = glossary.reset_index(drop=True)
 
-    # Rebuild positions after exclusions so they match the physical file layout.
-    config["field_position"] = range(1, len(config) + 1)
-    config["column_index"] = config["field_position"] - 1
-
-    if detected_column_count is not None and len(config) != detected_column_count:
+    if detected_column_count is not None and len(glossary) != detected_column_count:
         raise ValueError(
-            f"Config row count ({len(config)}) does not match detected column count "
+            f"Config row count ({len(glossary)}) does not match detected column count "
             f"({detected_column_count}). Check schema variant exclusions."
         )
+
+    config = pd.DataFrame()
+
+    # Rebuild positions after exclusions so the config matches the physical file layout.
+    config["field_position"] = range(1, len(glossary) + 1)
+    config["column_index"] = config["field_position"] - 1
+
+    # Official Fannie Mae label and standardized project names.
+    config["source_field_name"] = glossary["source_field_name"]
+    config["physical_name"] = glossary["physical_name"]
+    config["logical_name"] = glossary["logical_name"]
 
     config["source_data_type"] = glossary["Type"].astype(str).str.strip()
     config["source_max_length"] = glossary["Max Length"].astype(str).str.strip()
     config["sf_loan_performance"] = glossary[
         "Single-Family (SF) Loan Performance"
     ].astype(str).str.strip()
-    config["description"] = glossary["Description"].astype(str).str.replace("\n", " ", regex=False).str.strip()
+    config["description"] = (
+        glossary["Description"]
+        .astype(str)
+        .str.replace("\n", " ", regex=False)
+        .str.strip()
+    )
 
     # Useful for schema-version checks downstream.
     config["schema_column_count"] = len(config)
