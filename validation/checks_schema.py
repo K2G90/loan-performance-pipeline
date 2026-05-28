@@ -37,7 +37,7 @@ def validate_parquet_schema(path: Path) -> bool:
         return False
 
     # Check 2: required columns exist (now that you have named parquet)
-    required = ["loan_id", "mnthly_rpt_pd"]
+    required = ["loan_id", "monthly_reporting_period"]
     missing = [c for c in required if c not in df.columns]
     if missing:
         logging.error(f"{path.name}: Missing required columns: {missing}")
@@ -55,21 +55,21 @@ def validate_parquet_schema(path: Path) -> bool:
         return False
 
     # Check 4: reporting period not null + shape check
-    rpt_nulls = int(df["mnthly_rpt_pd"].isna().sum())
+    rpt_nulls = int(df["monthly_reporting_period"].isna().sum())
     if rpt_nulls > 0:
         logging.error(
-            f"{path.name}: mnthly_rpt_pd has {rpt_nulls:,} nulls "
+            f"{path.name}: monthly_reporting_period has {rpt_nulls:,} nulls "
             f"({_pct(rpt_nulls, rows):.2f}%)."
         )
         return False
 
     # Shape check: allow 5 or 6 digits (your sample includes both like 12010 and 102009)
-    rpt_as_str = df["mnthly_rpt_pd"].astype("Int64").astype(str)
+    rpt_as_str = df["monthly_reporting_period"].astype("Int64").astype(str)
     bad_len = ~rpt_as_str.str.len().isin([5, 6])
     bad_len_count = int(bad_len.sum())
     if bad_len_count > 0:
         logging.warning(
-            f"{path.name}: mnthly_rpt_pd has {bad_len_count:,} values not length 5 or 6 "
+            f"{path.name}: monthly_reporting_period has {bad_len_count:,} values not length 5 or 6 "
             f"(showing up to 5): {rpt_as_str[bad_len].head(5).tolist()}"
         )
 

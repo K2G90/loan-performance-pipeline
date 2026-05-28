@@ -42,14 +42,7 @@ LOGICAL_NAME_OVERRIDES: dict[str, str] = {
 }
 
 SCHEMA_VARIANT_EXCLUSIONS: dict[int, set[str]] = {
-    # 108-column sample layout excludes fields that exist in the full 113-column glossary.
-    108: {
-        "reference_pool_id",
-        "master_servicer",
-        "upb_at_issuance",
-        "loan_age",
-        "remaining_months_to_maturity",
-    },
+    #Current 108-column sample uses Field Position <= 108, so no. exclusionrule is needed.
 
     # Full 113-column layout keeps all glossary fields.
     113: set(),
