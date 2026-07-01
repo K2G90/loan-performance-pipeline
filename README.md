@@ -52,6 +52,7 @@ That glossary-driven approach helps make the pipeline more:
 ---
 
 ## Architecture Overview
+For a more detailed explanation of each pipeline layer, see [Pipeline Architecture](architecture/pipeline_architecture.md).
 
 Current local architecture:
 
