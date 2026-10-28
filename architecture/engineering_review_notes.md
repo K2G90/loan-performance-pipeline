@@ -22,6 +22,11 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 | `architecture/pipeline_architecture.md` | The architecture flow code fence appears to remain open in the committed document. | Repair Markdown rendering in a documentation-focused change. |
 | `modeling/star_schema.sql` | `dim_loan` selects DISTINCT combinations of several attributes from performance data. | Measure loan ID uniqueness and attribute stability before deciding the dimension's intended grain. |
 
+## Dependency and workspace housekeeping (deferred)
+
+- **Observed:** On GitHub, `requirements.txt` and `requirements.lock` currently contain identical dependency listings. Revisit the intended role of each file, then separate direct project dependencies from any reproducible lock strategy. Do not change dependencies during the current code walkthrough.
+- **User-confirmed:** Untracked `env` and `list` came from a separate Bash-versus-Zsh learning/cleanup exercise. Keep them out of LP-002 commits. Inspect and remove or relocate them only when ready; their contents have not been reviewed here.
+
 ## Proposed validation enhancements
 
 - Report counts of files checked, files passed, and files failed, while retaining the current overall Boolean result for now.
