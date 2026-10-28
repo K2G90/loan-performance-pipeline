@@ -1,0 +1,54 @@
+# Engineering Review Notes
+
+## Purpose
+
+Track observations, assumptions, proposed improvements, and follow-up work discovered while reviewing the Loan Performance Pipeline. These are **review notes**, not a claim that the improvements have been implemented.
+
+**Review scope:** Codebase re-entry and LP-002 (Strengthen Loan Dimension Modeling).
+
+## Confirmed code observations
+
+| Component | Current behavior | Follow-up |
+| --- | --- | --- |
+| `staging/standardize_columns.py` | `load_column_map()` checks whether its config path exists before calling `pd.read_csv()`. | Consider targeted `try/except` around file reading, preserve explicit schema precondition checks, and log actionable errors. |
+| `staging/standardize_columns.py` | Checks mapping length against the staged DataFrame's column count. | Count equality does not prove that a mapping matches the correct source layout; investigate schema-version verification. |
+| `validation/checks_schema.py` | Expects exactly 108 columns. | Investigate deriving an expected width from a verified, approved schema configuration instead of a global constant. |
+| `validation/checks_schema.py` | Defines `MAX_NULL_PCT_LOAN_ID` and `MAX_NULL_PCT_RPT_PD`, but directly checks null counts against zero. | Remove unused thresholds or intentionally implement threshold-based rules. |
+| `validation/checks_schema.py` | Uses file-level success/failure booleans. The runner continues checking other discovered files after one failure. | Count total/passed/failed files; later consider structured per-file findings. |
+| `validation/checks_schema.py` | Checks an optional `unused_field` for null values. | Reconcile this with the newer `reference_pool_id` field mapping and source layout. |
+| `orchestrator/run_pipeline.py` | Runs ingestion followed by validation; standardization is not included. | Align orchestration with validation's expectation of `*_named.parquet` files. |
+| `warehouse/run_sql.py` | Logs statement failures and continues rather than consistently failing the process. | Decide how SQL failures should propagate to callers and future CI jobs. |
+| `.gitignore` | Includes global `*.csv` and `.github/` exclusions. | Verify intended version control of schema metadata CSVs and future GitHub Actions workflows. |
+| `architecture/pipeline_architecture.md` | The architecture flow code fence appears to remain open in the committed document. | Repair Markdown rendering in a documentation-focused change. |
+| `modeling/star_schema.sql` | `dim_loan` selects DISTINCT combinations of several attributes from performance data. | Measure loan ID uniqueness and attribute stability before deciding the dimension's intended grain. |
+
+## Proposed validation enhancements
+
+- Report counts of files checked, files passed, and files failed, while retaining the current overall Boolean result for now.
+- Distinguish file-level failure counts from individual rule violations within a file.
+- Review fail-fast behavior versus collecting multiple failures per file.
+- Validate approved schema variants using glossary metadata, not column count alone.
+- Add model-integrity tests once the intended grains have been established.
+
+## Open questions and decisions pending
+
+1. Which physical Fannie Mae source files and layout variants are actually present locally?
+2. Should acquisition-style and performance-style attributes come from separate source files or a verified enhanced layout?
+3. What precise grain and attribute-time semantics should `modeled.dim_loan` use?
+4. What is the verified uniqueness key for the performance fact?
+5. Which changes belong in LP-002, and which should become separate stabilization/testing tickets?
+
+## Review approach
+
+For each potential change, record:
+
+- **Observation:** What the current source code or data shows.
+- **Hypothesis:** A possible explanation or risk, not yet proven.
+- **Decision:** The behavior we choose after comparing options.
+- **Verification:** The test or evidence proving that the decision works.
+
+## Status
+
+- **Review:** In progress.
+- **Implementation:** None of the proposed improvements above are marked complete.
+- **Next:** Finish the walkthrough of `validation/checks_schema.py`, then review source data and model grain before refactoring LP-002.
