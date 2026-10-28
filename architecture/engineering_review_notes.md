@@ -35,6 +35,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 - Validate approved schema variants using glossary metadata, not column count alone.
 - Add model-integrity tests once the intended grains have been established.
 
+- Consider semantic and temporal validation beyond required-column presence: confirm loan IDs and reporting periods are populated and well-formed, and investigate reporting-period relationships to origination/acquisition dates using the official source definitions. Do not assume an older loan's later monthly report is invalid; establish business rules first.
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
