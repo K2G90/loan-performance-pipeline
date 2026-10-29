@@ -37,6 +37,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - Consider semantic and temporal validation beyond required-column presence: confirm loan IDs and reporting periods are populated and well-formed, and investigate reporting-period relationships to origination/acquisition dates using the official source definitions. Do not assume an older loan's later monthly report is invalid; establish business rules first.
 
+- **Proposed decision (pending source-spec verification):** Treat invalid `monthly_reporting_period` values as validation failures rather than warnings. Check the source's documented format, normalize legitimate five-digit `MMYYYY` values where leading zero is lost, and validate real calendar months (1–12), reasonable year bounds, and safe parsing before modeling. Report failures clearly and ensure orchestration blocks downstream modeling on failure. This remains **not implemented**.
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
