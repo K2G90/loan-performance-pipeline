@@ -39,6 +39,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Proposed decision (pending source-spec verification):** Treat invalid `monthly_reporting_period` values as validation failures rather than warnings. Check the source's documented format, normalize legitimate five-digit `MMYYYY` values where leading zero is lost, and validate real calendar months (1–12), reasonable year bounds, and safe parsing before modeling. Report failures clearly and ensure orchestration blocks downstream modeling on failure. This remains **not implemented**.
 
+- **Stale artifact risk (observed design gap, not yet reproduced):** `run_schema_checks()` scans all matching `*_named.parquet` files without proving they were produced by the current successful standardization run. Old named Parquet files could pass validation after a new run fails or skips standardization. Plan to connect the orchestrator stages, validate explicitly expected current-run outputs (for example via an output manifest/run ID), and stop downstream processing on failure. Distinguish a separately invoked validation command from automatic continuation by the orchestrator.
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
