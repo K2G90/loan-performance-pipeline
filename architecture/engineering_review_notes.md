@@ -43,6 +43,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **CLI exit-code gap:** `validation/checks_schema.py` calls `run_schema_checks()` in its `__main__` guard but discards the returned Boolean. On a handled validation failure, it can log failure yet exit with status 0. The orchestrator instead turns a false result into nonzero status 2 via `sys.exit(main())`. Proposed fix: make standalone validation return a nonzero exit code while preserving its callable Boolean API, and test both invocation paths. **Not yet implemented.**
 
+- **Ingestion failure propagation (observed):** `ingestion.run_ingestion()` logs a missing `data/raw/` directory and returns normally without raising an exception or signaling failure. `orchestrator.run_pipeline()` treats an exception-free return as success, logs ingestion complete, and moves on. Proposed improvement: use a clear failure contract (such as raising `FileNotFoundError` for required input missing) so the orchestrator logs the exception, returns a nonzero exit code, and does not proceed. Also assess handling of zero matching input files. **Not yet implemented.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
