@@ -45,6 +45,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Ingestion failure propagation (observed):** `ingestion.run_ingestion()` logs a missing `data/raw/` directory and returns normally without raising an exception or signaling failure. `orchestrator.run_pipeline()` treats an exception-free return as success, logs ingestion complete, and moves on. Proposed improvement: use a clear failure contract (such as raising `FileNotFoundError` for required input missing) so the orchestrator logs the exception, returns a nonzero exit code, and does not proceed. Also assess handling of zero matching input files. **Not yet implemented.**
 
+- **Empty-batch semantics (design discussion):** An incremental pipeline may legitimately have zero *new* files; in that case a successful no-op with clear logging is preferable to an error. Distinguish this from zero *available/matching* input files on initial setup or a missing input directory, which could indicate misconfiguration. Decide and test the expected contract for full-load versus incremental runs, using explicit input discovery / processed-file state rather than assuming any zero-file case is success. **Policy not finalized; no implementation change.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
