@@ -41,6 +41,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Stale artifact risk (observed design gap, not yet reproduced):** `run_schema_checks()` scans all matching `*_named.parquet` files without proving they were produced by the current successful standardization run. Old named Parquet files could pass validation after a new run fails or skips standardization. Plan to connect the orchestrator stages, validate explicitly expected current-run outputs (for example via an output manifest/run ID), and stop downstream processing on failure. Distinguish a separately invoked validation command from automatic continuation by the orchestrator.
 
+- **CLI exit-code gap:** `validation/checks_schema.py` calls `run_schema_checks()` in its `__main__` guard but discards the returned Boolean. On a handled validation failure, it can log failure yet exit with status 0. The orchestrator instead turns a false result into nonzero status 2 via `sys.exit(main())`. Proposed fix: make standalone validation return a nonzero exit code while preserving its callable Boolean API, and test both invocation paths. **Not yet implemented.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
