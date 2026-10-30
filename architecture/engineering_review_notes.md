@@ -47,6 +47,15 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Empty-batch semantics (design discussion):** An incremental pipeline may legitimately have zero *new* files; in that case a successful no-op with clear logging is preferable to an error. Distinguish this from zero *available/matching* input files on initial setup or a missing input directory, which could indicate misconfiguration. Decide and test the expected contract for full-load versus incremental runs, using explicit input discovery / processed-file state rather than assuming any zero-file case is success. **Policy not finalized; no implementation change.**
 
+## Future UI, API, and deployment integration (planning only)
+
+- **User objective:** Evolve the pipeline into a usable web application as we approach online deployment and GitHub Actions, while preserving the core learning goals in backend, data, and AWS/cloud engineering.
+- **Proposed architecture:** Independent ingestion/staging/validation/warehouse/modeling/analytics pipeline -> documented read-only API boundary (FastAPI candidate) -> dashboard/UI. Treat the API as a consumer of approved analytics outputs and pipeline-run metadata, not as a direct browser connection to DuckDB or raw data.
+- **Initial UI scope candidates:** Monthly trends, active-loan counts, outstanding principal balance, average interest rate, and pipeline/data-quality run status. Verify the meaning and correctness of each metric before surfacing it.
+- **Sequence:** Stabilize pipeline behavior and model semantics; establish tested analytics outputs; design API response contracts; prototype UI (Streamlit vs separate frontend to be decided); then deploy with GitHub Actions testing/deployment automation and an appropriate cloud host.
+- **Controls to design:** Authentication/authorization if nonpublic access, safe query/filter limits, logging/monitoring, secrets management, deployment environments, budgets/cost alerts, and the ability to distinguish stale from freshly processed datasets. Any future trigger/reprocess controls require explicit safeguards and auditing.
+- **Status:** Planning only. No UI/API/framework, AWS deployment service, hosting budget, or implementation timeline has been finalized. Keep UI scope outside the LP-002 loan-dimension modeling acceptance criteria; organize it as separate follow-on work.
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
