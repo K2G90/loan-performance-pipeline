@@ -503,8 +503,24 @@ Future:
 - Add dbt-style transformations or dbt integration
 - Add Airflow-style orchestration
 - Add AWS cloud version using S3, Glue, and Redshift/Athena
-- Add dashboard or API layer
+- Introduce a read-only backend API to expose validated analytics metrics and pipeline health (FastAPI candidate)
+- Add a web UI/dashboard for loan-performance trends, metrics, and data-quality/run status (Streamlit prototype or a separate web frontend; choose later)
+- Deploy the API and UI using an appropriate, cost-aware hosting approach, supported by GitHub Actions CI/CD
 - Add observability and monitoring concepts
+
+### Planned UI and deployment integration
+
+This is an **architectural direction, not an implemented feature**. Keep the data pipeline independent of the UI so ingestion, validation, modeling, and analytics can run and be tested without a web server.
+
+Proposed sequence:
+
+1. Stabilize end-to-end orchestration, model grain, data quality, tests, and reliable failure reporting.
+2. Establish stable, documented analytics outputs and a read-only API contract (e.g., monthly metrics, filtered loan aggregates, and pipeline/validation status).
+3. Prototype a minimal dashboard consuming those outputs; decide whether a fast demonstration UI or a separate frontend best fits learning and product goals.
+4. Automate tests and deployment with GitHub Actions, then deploy API and UI with security, logging, access controls, and cost limits.
+5. Consider authenticated pipeline-triggering and other operations only after permissions, execution controls, and auditability are designed.
+
+**Boundary:** GitHub Actions automates checks and deployments; it is not itself the web application host. Avoid exposing raw local files, database credentials, or unrestricted warehouse queries to a browser.
 
 ---
 
