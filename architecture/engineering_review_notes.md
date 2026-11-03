@@ -62,6 +62,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Partial standardization on exception (review finding):** `staging/standardize_columns.py` loops over eligible Parquet files in `main()` without catching exceptions from `standardize_one()`. If a later file raises `ValueError` for a column-map width mismatch, the loop stops, and subsequent files are not processed. Earlier `_named.parquet` outputs already written may remain, leaving a partially completed run. Fail-fast behavior is useful, but later design should track per-run outputs/completion and prevent downstream validation or publication from treating partial or stale artifacts as a complete refresh. Consider whether transactional/atomic publication or a manifest is appropriate. **Not implemented.**
 
+- **Structured stage results / per-file visibility (proposed):** Rather than only returning `None`, ingestion and standardization could expose a processing summary to the orchestrator: discovered/expected file count (when knowable from input discovery or a manifest), processed files, row counts, successful outputs, failed files with reasons, and files not attempted after a fail-fast exception. This would shorten debugging, distinguish incomplete batches from valid no-ops, inform validation eligibility, and eventually power a pipeline-status dashboard. Reporting is complementary to raising/propagating failures; do not convert an exception into a misleading success result. **Design proposal, not implemented.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
