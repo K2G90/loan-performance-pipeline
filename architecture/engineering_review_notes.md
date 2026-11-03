@@ -64,6 +64,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Structured stage results / per-file visibility (proposed):** Rather than only returning `None`, ingestion and standardization could expose a processing summary to the orchestrator: discovered/expected file count (when knowable from input discovery or a manifest), processed files, row counts, successful outputs, failed files with reasons, and files not attempted after a fail-fast exception. This would shorten debugging, distinguish incomplete batches from valid no-ops, inform validation eligibility, and eventually power a pipeline-status dashboard. Reporting is complementary to raising/propagating failures; do not convert an exception into a misleading success result. **Design proposal, not implemented.**
 
+- **Fact-to-dimension unmatched records (review proposal):** An anti-join can reveal performance facts without a matching loan dimension. Investigate causes and quantify affected rows, unique loans, and metric impact before deciding whether this is expected or a quality failure. Retain source records and verify the relationship rules; do not automatically delete unmatched facts. **Not implemented.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
