@@ -58,6 +58,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 - **Controls to design:** Authentication/authorization if nonpublic access, safe query/filter limits, logging/monitoring, secrets management, deployment environments, budgets/cost alerts, and the ability to distinguish stale from freshly processed datasets. Any future trigger/reprocess controls require explicit safeguards and auditing.
 - **Status:** Planning only. No UI/API/framework, AWS deployment service, hosting budget, or implementation timeline has been finalized. Keep UI scope outside the LP-002 loan-dimension modeling acceptance criteria; organize it as separate follow-on work.
 
+- **End-to-end success contract / GitHub Actions (review discussion):** `orchestrator/run_pipeline.py` returns `0` after ingestion and schema validation alone; it does not currently invoke standardization, warehouse setup, modeling, or analytics. An automated job that treats this exit code as full-pipeline success could show a misleading green status while warehouse/analytics outputs remain absent or stale. Define named execution modes or an explicit full-run contract; order stages with appropriate prerequisites, propagate downstream failures, and add end-to-end tests before claiming a full refresh or publishing dashboard metrics. **Not implemented.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
