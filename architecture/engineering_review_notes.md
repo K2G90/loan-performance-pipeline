@@ -47,6 +47,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **Empty-batch semantics (design discussion):** An incremental pipeline may legitimately have zero *new* files; in that case a successful no-op with clear logging is preferable to an error. Distinguish this from zero *available/matching* input files on initial setup or a missing input directory, which could indicate misconfiguration. Decide and test the expected contract for full-load versus incremental runs, using explicit input discovery / processed-file state rather than assuming any zero-file case is success. **Policy not finalized; no implementation change.**
 
+- **Unmatched-input and stale-success guardrail (user observation):** A filename typo or unexpected suffix can cause a legitimate raw input to be skipped by `acquisition_*.csv` / `performance_*.csv`, while older `*_named.parquet` files remain in staging and pass schema checks. Proposed investigation: report discovery directory and expected patterns, total candidate files and matched/unmatched names, files actually processed this run, and which standardized artifacts are eligible for validation. Differentiate a confirmed successful no-op from an apparent success based on stale output. Design how an unexpected or unmatched file should alert or fail, rather than assume no new files. **Not implemented.**
+
 ## Future UI, API, and deployment integration (planning only)
 
 - **User objective:** Evolve the pipeline into a usable web application as we approach online deployment and GitHub Actions, while preserving the core learning goals in backend, data, and AWS/cloud engineering.
