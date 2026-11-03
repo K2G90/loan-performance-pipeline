@@ -60,6 +60,8 @@ Track observations, assumptions, proposed improvements, and follow-up work disco
 
 - **End-to-end success contract / GitHub Actions (review discussion):** `orchestrator/run_pipeline.py` returns `0` after ingestion and schema validation alone; it does not currently invoke standardization, warehouse setup, modeling, or analytics. An automated job that treats this exit code as full-pipeline success could show a misleading green status while warehouse/analytics outputs remain absent or stale. Define named execution modes or an explicit full-run contract; order stages with appropriate prerequisites, propagate downstream failures, and add end-to-end tests before claiming a full refresh or publishing dashboard metrics. **Not implemented.**
 
+- **Partial standardization on exception (review finding):** `staging/standardize_columns.py` loops over eligible Parquet files in `main()` without catching exceptions from `standardize_one()`. If a later file raises `ValueError` for a column-map width mismatch, the loop stops, and subsequent files are not processed. Earlier `_named.parquet` outputs already written may remain, leaving a partially completed run. Fail-fast behavior is useful, but later design should track per-run outputs/completion and prevent downstream validation or publication from treating partial or stale artifacts as a complete refresh. Consider whether transactional/atomic publication or a manifest is appropriate. **Not implemented.**
+
 ## Open questions and decisions pending
 
 1. Which physical Fannie Mae source files and layout variants are actually present locally?
